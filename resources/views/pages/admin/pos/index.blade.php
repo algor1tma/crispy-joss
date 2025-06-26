@@ -197,6 +197,9 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="bi bi-x-circle"></i> Tutup
                     </button>
+                    {{-- <button type="button" class="btn btn-success" id="download-thermal-pdf">
+                        <i class="bi bi-file-earmark-pdf"></i> Download PDF Thermal
+                    </button> --}}
                     <button type="button" class="btn btn-primary" id="print-receipt">
                         <i class="bi bi-printer"></i> Cetak Struk
                     </button>
@@ -347,6 +350,9 @@
                             text: response.message || 'Transaksi berhasil.'
                         });
 
+                        // Store transaction ID for PDF download
+                        window.currentTransactionId = response.transaction_id;
+
                         // Load receipt
                         $.get("{{ url('pos/receipt') }}/" + response.transaction_id,
                             function(data) {
@@ -425,12 +431,21 @@
                 const printWindow = window.open('', '_blank');
                 printWindow.document.write('<html><head><title>Struk Transaksi</title>');
                 printWindow.document.write('<style>');
-                printWindow.document.write('body { font-family: Arial, sans-serif; font-size: 12px; }');
-                printWindow.document.write('table { width: 100%; border-collapse: collapse; }');
-                printWindow.document.write('th, td { padding: 5px; }');
-                printWindow.document.write('hr { border: none; border-top: 1px dashed #000; }');
+                printWindow.document.write('@page { size: 58mm auto; margin: 0; }');
+                printWindow.document.write('body { font-family: "Courier New", monospace; font-size: 9px; margin: 0; padding: 2mm; width: 54mm; color: #000; background: #fff; }');
+                printWindow.document.write('table { width: 100%; border-collapse: collapse; font-size: 8px; }');
+                printWindow.document.write('th, td { padding: 1px 2px; border: none; vertical-align: top; }');
+                printWindow.document.write('th { font-weight: bold; }');
+                printWindow.document.write('hr { border: none; border-top: 1px dashed #000; margin: 2px 0; }');
                 printWindow.document.write('.text-center { text-align: center; }');
                 printWindow.document.write('.text-end { text-align: right; }');
+                printWindow.document.write('h4 { font-size: 12px; margin: 2px 0; font-weight: bold; }');
+                printWindow.document.write('p { margin: 1px 0; font-size: 8px; line-height: 1.2; }');
+                printWindow.document.write('.receipt { width: 100%; }');
+                printWindow.document.write('.mb-4 { margin-bottom: 4px; }');
+                printWindow.document.write('thead th { font-size: 7px; }');
+                printWindow.document.write('tbody td { font-size: 7px; }');
+                printWindow.document.write('tfoot th { font-size: 8px; font-weight: bold; }');
                 printWindow.document.write('</style>');
                 printWindow.document.write('</head><body>');
                 printWindow.document.write(printContent);
@@ -441,6 +456,19 @@
                     printWindow.focus();
                     printWindow.print();
                 }, 300);
+            });
+
+            // Download thermal PDF
+            $('#download-thermal-pdf').click(function() {
+                if (window.currentTransactionId) {
+                    window.open("{{ url('pos/thermal-receipt') }}/" + window.currentTransactionId, '_blank');
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'ID transaksi tidak ditemukan!'
+                    });
+                }
             });
 
             // Update cart view

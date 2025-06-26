@@ -174,6 +174,29 @@ class PosController extends Controller
         }
     }
 
+    public function printThermalReceipt($id)
+    {
+        try {
+            $transaction = Transaksi::with('details.produk')->findOrFail($id);
+
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pages.admin.pos.thermal-receipt', compact('transaction'));
+
+            // Set paper size for thermal receipt (58mm width)
+            $pdf->setPaper([0, 0, 164.41, 'auto'], 'portrait'); // 58mm = 164.41 points
+
+            return $pdf->stream('struk-' . $transaction->id . '.pdf');
+        } catch (\Exception $e) {
+            Log::error('Print thermal receipt error: ' . $e->getMessage());
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Gagal membuat PDF struk: ' . $e->getMessage(),
+                ],
+                500,
+            );
+        }
+    }
+
     /**
      * Check if product can be sold (considering both product stock and raw materials)
      */
