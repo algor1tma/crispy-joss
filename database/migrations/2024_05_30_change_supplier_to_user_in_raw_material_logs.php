@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('raw_material_logs', function (Blueprint $table) {
-            // Drop the existing foreign key
             $table->dropForeign(['supplier_id']);
             // Rename the column and add new foreign key
             $table->renameColumn('supplier_id', 'user_id');
@@ -33,4 +32,4 @@ return new class extends Migration
             $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('set null');
         });
     }
-}; 
+};
