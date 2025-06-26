@@ -3,7 +3,38 @@
 
       <ul class="sidebar-nav" id="sidebar-nav">
 
-          @if (auth()->user()->roles === 'admin')
+          @if (auth()->user()->roles === 'super')
+              <li class="nav-item">
+                  <a class="nav-link {{ Request::is('dashboard*') ? '' : 'collapsed' }}"
+                      href="{{ route('indexDashboard') }}">
+                      <i class="bi bi-grid"></i>
+                      <span>Dashboard</span>
+                  </a>
+              </li><!-- End Dashboard Nav -->
+
+              <li class="nav-item">
+                  <a class="nav-link {{ Request::is('super/manage-users*') || Request::is('super/create-user*') || Request::is('super/edit-user*') ? '' : 'collapsed' }}"
+                      data-bs-target="#user-management-nav" data-bs-toggle="collapse" href="#">
+                      <i class="bi bi-people"></i><span>User Management</span><i class="bi bi-chevron-down ms-auto"></i>
+                  </a>
+                  <ul id="user-management-nav"
+                      class="nav-content collapse {{ Request::is('super/manage-users*') || Request::is('super/create-user*') || Request::is('super/edit-user*') ? 'show' : '' }}"
+                      data-bs-parent="#sidebar-nav">
+                      <li>
+                          <a href="{{ route('super.manage-users') }}"
+                              class="{{ Request::is('super/manage-users*') ? 'text-primary' : '' }}">
+                              <i class="bi bi-list"></i><span>Manage Users</span>
+                          </a>
+                      </li>
+                      <li>
+                          <a href="{{ route('super.create-user') }}"
+                              class="{{ Request::is('super/create-user*') ? 'text-primary' : '' }}">
+                              <i class="bi bi-person-plus"></i><span>Add New User</span>
+                          </a>
+                      </li>
+                  </ul>
+              </li><!-- End User Management Nav -->
+          @elseif (auth()->user()->roles === 'admin')
               <li class="nav-item">
                   <a class="nav-link {{ Request::is('dashboard*') ? '' : 'collapsed' }}"
                       href="{{ route('indexDashboard') }}">
@@ -29,13 +60,13 @@
                       </li>
                   </ul> --}}
               </li><!-- End Components Nav -->
-              <li class="nav-item">
-                <a class="nav-link {{ Request::is('Karyawan*') ? '' : 'collapsed' }}"
-                    href="{{ route('indexKaryawan') }}">
-                    <i class="bi bi-person"></i>
-                    <span>karyawan</span>
-                </a>
-            </li>
+              {{-- <li class="nav-item">
+                  <a class="nav-link {{ Request::is('Karyawan*') ? '' : 'collapsed' }}"
+                      href="{{ route('indexKaryawan') }}">
+                      <i class="bi bi-person"></i>
+                      <span>karyawan</span>
+                  </a>
+              </li> --}}
 
 
               <li class="nav-item">
@@ -53,25 +84,25 @@
                           </a>
                       </li>
                       <li>
-                        <a href="{{ route('raw-materials.purchase') }}"
-                            class="{{ Request::is('raw-materials/purchase') ? 'text-primary' : '' }}">
-                            <i class=""></i><span>Pembelian</span>
-                        </a>
-                    </li>
-                    @if(auth()->user()->roles === 'admin')
-                      <li>
-                          <a href="{{ route('raw-materials.low-stock') }}"
-                              class="{{ Request::is('low-stock-materials') ? 'text-primary' : '' }}">
-                              <i class=""></i><span>Stok Menipis</span>
+                          <a href="{{ route('raw-materials.purchase') }}"
+                              class="{{ Request::is('raw-materials/purchase') ? 'text-primary' : '' }}">
+                              <i class=""></i><span>Pembelian</span>
                           </a>
                       </li>
-                      
-                      <li>
-                          <a href="{{ route('raw-materials.report') }}"
-                              class="{{ Request::is('raw-materials-report') ? 'text-primary' : '' }}">
-                              <i class=""></i><span>Laporan</span>
-                          </a>
-                      </li>
+                      @if (auth()->user()->roles === 'admin')
+                          <li>
+                              <a href="{{ route('raw-materials.low-stock') }}"
+                                  class="{{ Request::is('low-stock-materials') ? 'text-primary' : '' }}">
+                                  <i class=""></i><span>Stok Menipis</span>
+                              </a>
+                          </li>
+
+                          <li>
+                              <a href="{{ route('raw-materials.report') }}"
+                                  class="{{ Request::is('raw-materials-report') ? 'text-primary' : '' }}">
+                                  <i class=""></i><span>Laporan</span>
+                              </a>
+                          </li>
                       @endif
                   </ul>
               </li>
@@ -85,17 +116,15 @@
               </li> --}}
 
               <li class="nav-item">
-                <a class="nav-link {{ Request::is('produk*') ? '' : 'collapsed' }}"
-                    href="{{ route('produk.index') }}">
-                    <i class="bi bi-box"></i>
-                    <span>Produk</span>
-                </a>
-            </li>
-
+                  <a class="nav-link {{ Request::is('produk*') ? '' : 'collapsed' }}"
+                      href="{{ route('produk.index') }}">
+                      <i class="bi bi-box"></i>
+                      <span>Produk</span>
+                  </a>
+              </li>
 
               <li class="nav-item">
-                  <a class="nav-link {{ Request::is('pos*') ? '' : 'collapsed' }}"
-                      href="{{ route('pos.index') }}">
+                  <a class="nav-link {{ Request::is('pos*') ? '' : 'collapsed' }}" href="{{ route('pos.index') }}">
                       <i class="bi bi-cart"></i>
                       <span>Point of Sale</span>
                   </a>
@@ -108,9 +137,8 @@
                       <span>Laporan Penjualan</span>
                   </a>
               </li>
-              
-              <!-- End Dashboard Nav -->
 
+              <!-- End Dashboard Nav -->
           @elseif (auth()->user()->roles === 'karyawan')
               <li class="nav-item">
                   <a class="nav-link {{ Request::is('dashboard*') ? '' : 'collapsed' }}"
@@ -158,19 +186,18 @@
               </li>
 
               <li class="nav-item">
-                  <a class="nav-link {{ Request::is('pos*') ? '' : 'collapsed' }}"
-                      href="{{ route('pos.index') }}">
+                  <a class="nav-link {{ Request::is('pos*') ? '' : 'collapsed' }}" href="{{ route('pos.index') }}">
                       <i class="bi bi-cart"></i>
                       <span>Point of Sale</span>
                   </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link {{ Request::is('laporan-penjualan*') ? '' : 'collapsed' }}"
-                    href="{{ route('laporanpenjualan.index') }}">
-                    <i class="bi bi-file-earmark-text"></i>
-                    <span>Laporan Penjualan</span>
-                </a>
-            </li>
+                  <a class="nav-link {{ Request::is('laporan-penjualan*') ? '' : 'collapsed' }}"
+                      href="{{ route('laporanpenjualan.index') }}">
+                      <i class="bi bi-file-earmark-text"></i>
+                      <span>Laporan Penjualan</span>
+                  </a>
+              </li>
 
           @endif
       </ul>

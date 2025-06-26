@@ -71,24 +71,29 @@
                                         <div class="row">
                                             <div class="col-sm-4">
                                                 <select name="recipes[0][material_id]" class="form-select" required>
-                                                    <option value="">Pilih Bahan Baku</option>
-                                                    @foreach($materials as $material)
-                                                        <option value="{{ $material->id }}" data-unit="{{ $material->unit }}">
-                                                            {{ $material->name }} ({{ $material->unit }})
-                                                        </option>
-                                                    @endforeach
+                                                    <option value="">Pilih Bahan Baku</option>                                @foreach($materials as $material)
+                                    <option value="{{ $material->id }}"
+                                            data-unit="{{ $material->unit }}"
+                                            data-category="{{
+                                                $material->unit === 'g' || $material->unit === 'kg' ? 'weight' :
+                                                ($material->unit === 'ml' || $material->unit === 'l' ? 'volume' : 'quantity')
+                                            }}">
+                                        {{ $material->name }} ({{ $material->unit }})
+                                    </option>
+                                @endforeach
                                                 </select>
                                             </div>
                                             <div class="col-sm-3">
                                                 <input type="number" name="recipes[0][quantity]" class="form-control" placeholder="Jumlah" required>
                                             </div>
                                             <div class="col-sm-3">
-                                                <select name="recipes[0][unit]" class="form-select" required>
-                                                    <option value="g">Gram (g)</option>
-                                                    <option value="kg">Kilogram (kg)</option>
-                                                    <option value="ml">Mililiter (ml)</option>
-                                                    <option value="l">Liter (l)</option>
-                                                    <option value="pcs">Pieces (pcs)</option>
+                                                <select name="recipes[0][unit]" class="form-select unit-select" required>
+                                                    <option value="">Pilih Satuan</option>
+                                                    <option value="g" data-category="weight">Gram (g)</option>
+                                                    <option value="kg" data-category="weight">Kilogram (kg)</option>
+                                                    <option value="ml" data-category="volume">Mililiter (ml)</option>
+                                                    <option value="l" data-category="volume">Liter (l)</option>
+                                                    <option value="pcs" data-category="quantity">Pieces (pcs)</option>
                                                 </select>
                                             </div>
                                             <div class="col-sm-2">
@@ -134,7 +139,12 @@
                             <select name="recipes[${recipeCount}][material_id]" class="form-select" required>
                                 <option value="">Pilih Bahan Baku</option>
                                 @foreach($materials as $material)
-                                    <option value="{{ $material->id }}" data-unit="{{ $material->unit }}">
+                                    <option value="{{ $material->id }}"
+                                            data-unit="{{ $material->unit }}"
+                                            data-category="{{
+                                                $material->unit === 'g' || $material->unit === 'kg' ? 'weight' :
+                                                ($material->unit === 'ml' || $material->unit === 'l' ? 'volume' : 'quantity')
+                                            }}">
                                         {{ $material->name }} ({{ $material->unit }})
                                     </option>
                                 @endforeach
@@ -144,12 +154,13 @@
                             <input type="number" name="recipes[${recipeCount}][quantity]" class="form-control" placeholder="Jumlah" required>
                         </div>
                         <div class="col-sm-3">
-                            <select name="recipes[${recipeCount}][unit]" class="form-select" required>
-                                <option value="g">Gram (g)</option>
-                                <option value="kg">Kilogram (kg)</option>
-                                <option value="ml">Mililiter (ml)</option>
-                                <option value="l">Liter (l)</option>
-                                <option value="pcs">Pieces (pcs)</option>
+                            <select name="recipes[${recipeCount}][unit]" class="form-select unit-select" required>
+                                <option value="">Pilih Satuan</option>
+                                <option value="g" data-category="weight">Gram (g)</option>
+                                <option value="kg" data-category="weight">Kilogram (kg)</option>
+                                <option value="ml" data-category="volume">Mililiter (ml)</option>
+                                <option value="l" data-category="volume">Liter (l)</option>
+                                <option value="pcs" data-category="quantity">Pieces (pcs)</option>
                             </select>
                         </div>
                         <div class="col-sm-2">
@@ -171,11 +182,55 @@
             $(this).closest('.recipe-item').remove();
         });
 
-        // Auto-select unit based on material
+        // Auto-filter units based on material category
         $(document).on('change', 'select[name$="[material_id]"]', function() {
             const selectedOption = $(this).find('option:selected');
-            const unit = selectedOption.data('unit');
-            $(this).closest('.row').find('select[name$="[unit]"]').val(unit);
+            const materialCategory = selectedOption.data('category');
+            const unitSelect = $(this).closest('.row').find('.unit-select');
+
+            // Reset unit select
+            unitSelect.find('option').hide();
+            unitSelect.find('option[value=""]').show();
+
+            if (materialCategory) {
+                // Show only compatible units
+                unitSelect.find(`option[data-category="${materialCategory}"]`).show();
+
+                // Auto-select the material's unit if available
+                const materialUnit = selectedOption.data('unit');
+                if (materialUnit) {
+                    unitSelect.val(materialUnit);
+                }
+            } else {
+                // Show all units if no material selected
+                unitSelect.find('option').show();
+            }
+        });
+
+        // Validate unit compatibility before form submission
+        $('form').on('submit', function(e) {
+            let isValid = true;
+
+            $('select[name$="[material_id]"]').each(function() {
+                const materialOption = $(this).find('option:selected');
+                const unitSelect = $(this).closest('.recipe-item').find('.unit-select');
+                const selectedUnit = unitSelect.val();
+
+                if (materialOption.val() && selectedUnit) {
+                    const materialCategory = materialOption.data('category');
+                    const unitCategory = unitSelect.find(`option[value="${selectedUnit}"]`).data('category');
+
+                    if (materialCategory !== unitCategory) {
+                        alert(`Satuan "${selectedUnit}" tidak kompatibel dengan bahan "${materialOption.text()}"`);
+                        isValid = false;
+                        return false;
+                    }
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+            }
         });
     });
 </script>

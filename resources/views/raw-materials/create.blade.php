@@ -23,7 +23,7 @@
                             @csrf
                             <div class="col-12">
                                 <label class="form-label">Nama Bahan</label>
-                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" 
+                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                                        value="{{ old('name') }}" required>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -32,7 +32,7 @@
 
                             <div class="col-12">
                                 <label class="form-label">Deskripsi</label>
-                                <textarea name="description" class="form-control @error('description') is-invalid @enderror" 
+                                <textarea name="description" class="form-control @error('description') is-invalid @enderror"
                                           rows="3">{{ old('description') }}</textarea>
                                 @error('description')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -42,7 +42,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Stok Awal</label>
                                 <div class="input-group">
-                                    <input type="number" name="stock" class="form-control @error('stock') is-invalid @enderror" 
+                                    <input type="number" name="stock" class="form-control @error('stock') is-invalid @enderror"
                                            value="{{ old('stock', 0) }}" required min="0" step="0.01">
                                     <span class="input-group-text" id="unit-addon"></span>
                                     @error('stock')
@@ -53,9 +53,15 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Satuan</label>
-                                <input type="text" name="unit" class="form-control @error('unit') is-invalid @enderror" 
-                                       value="{{ old('unit') }}" required placeholder="Contoh: kg, pcs, liter"
-                                       onchange="document.getElementById('unit-addon').textContent = this.value">
+                                <select name="unit" class="form-select @error('unit') is-invalid @enderror" required
+                                        onchange="updateUnitDisplay(this.value)">
+                                    <option value="">Pilih Satuan</option>
+                                    <option value="g">Gram (g)</option>
+                                    <option value="kg">Kilogram (kg)</option>
+                                    <option value="ml">Mililiter (ml)</option>
+                                    <option value="l">Liter (l)</option>
+                                    <option value="pcs">Pieces (pcs)</option>
+                                </select>
                                 @error('unit')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -65,7 +71,7 @@
                                 <label class="form-label">Harga per Satuan</label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="number" name="price" class="form-control @error('price') is-invalid @enderror" 
+                                    <input type="number" name="price" class="form-control @error('price') is-invalid @enderror"
                                            value="{{ old('price') }}" required min="0" step="0.01">
                                     <span class="input-group-text">/ <span class="unit-display"></span></span>
                                     @error('price')
@@ -103,11 +109,16 @@
 
     @push('scripts')
     <script>
-        document.querySelector('input[name="unit"]').addEventListener('input', function(e) {
+        function updateUnitDisplay(unit) {
+            document.getElementById('unit-addon').textContent = unit;
             document.querySelectorAll('.unit-display').forEach(el => {
-                el.textContent = e.target.value;
+                el.textContent = unit;
             });
+        }
+
+        document.querySelector('select[name="unit"]').addEventListener('change', function(e) {
+            updateUnitDisplay(e.target.value);
         });
     </script>
     @endpush
-@endsection 
+@endsection
