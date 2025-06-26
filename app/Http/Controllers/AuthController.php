@@ -16,41 +16,45 @@ class AuthController extends Controller
     }
 
     public function authenticate(Request $request)
-{
-    $request->validate([
-        'login' => 'required|string',
-        'password' => 'required|string',
-    ]);
+    {
+        $request->validate([
+            'username' => 'required|string|min:3|max:50|regex:/^[a-zA-Z0-9_]+$/',
+            'password' => 'required|string|min:6',
+        ], [
+            'username.required' => 'Username harus diisi',
+            'username.min' => 'Username minimal 3 karakter',
+            'username.max' => 'Username maksimal 50 karakter',
+            'username.regex' => 'Username hanya boleh berisi huruf, angka, dan underscore',
+            'password.required' => 'Password harus diisi',
+            'password.min' => 'Password minimal 6 karakter',
+        ]);
 
-    $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $credentials = [
+            'username' => $request->username,
+            'password' => $request->password,
+        ];
 
-    $credentials = [
-        $loginType => $request->login,
-        'password' => $request->password,
-    ];
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
 
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
+            $user = Auth::user();
 
-        $user = Auth::user();
+            if (!$user->roles) {
+                Auth::logout();
+                return back()->with('loginError', 'Akun tidak memiliki hak akses!');
+            }
 
-        if (!$user->roles) {
-            Auth::logout();
-            return back()->with('loginError', 'Akun tidak memiliki hak akses!');
+            // Redirect sesuai role
+            Alert::success('Success', 'Login Berhasil');
+
+            if ($user->roles === 'karyawan') {
+                return redirect()->intended(route('produk.index'));
+            }
+
+            return redirect()->intended(route('indexDashboard'));
         }
 
-        // Redirect sesuai role
-        Alert::success('Success', 'Login Berhasil');
-
-        if ($user->roles === 'karyawan') {
-            return redirect()->intended(route('produk.index'));
-        }
-
-        return redirect()->intended(route('indexDashboard'));
-    }
-
-    return back()->with('loginError', 'Username/email atau password salah!');
-
+        return back()->with('loginError', 'Username atau password salah!');
     }
 
     public function create(){
