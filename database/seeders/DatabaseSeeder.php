@@ -17,29 +17,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
-
-        $this->call(UserSeeder::class);
-
-        // Create default admin user
-        $user = User::create([
-            'email' => 'admin@admin.com',
-            'password' => Hash::make('password'),
-            'roles' => 'admin',
-        ]);
-
-        // Create admin profile
-        Admin::create([
-            'user_id' => $user->id,
-            'nama' => 'Administrator',
-            'jenis_kelamin' => 'L',
-            'no_telp' => '08123456789',
-            'alamat' => 'Jl. Admin No. 1',
+        $this->call([
+            UserSeeder::class,
+            RawMaterialSeeder::class,
+            ProductSeeder::class,
+            ProductRecipeSeeder::class,
         ]);
     }
 }
