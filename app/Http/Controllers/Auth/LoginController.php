@@ -61,14 +61,14 @@ class LoginController extends Controller
         if ($user->deleted_at !== null) {
             Auth::logout();
             return redirect()->route('login')
-                ->withErrors(['email' => 'Akun ini tidak aktif.']);
+                ->withErrors(['username' => 'Akun ini tidak aktif.']);
         }
 
         // Check if user has a valid role
         if (!$user->hasValidRole()) {
             Auth::logout();
             return redirect()->route('login')
-                ->withErrors(['email' => 'Role tidak valid.']);
+                ->withErrors(['username' => 'Role tidak valid.']);
         }
 
         // Redirect based on role with specific messages
@@ -82,13 +82,13 @@ class LoginController extends Controller
             default:
                 Auth::logout();
                 return redirect()->route('login')
-                    ->withErrors(['email' => 'Role tidak valid.']);
+                    ->withErrors(['username' => 'Role tidak valid.']);
         }
     }
 
     public function username()
     {
-        return 'email';
+        return 'username';
     }
 
     public function logout(Request $request)
@@ -98,4 +98,4 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
         return redirect()->route('login');
     }
-} 
+}
