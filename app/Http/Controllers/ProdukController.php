@@ -53,8 +53,21 @@ class ProdukController extends Controller
             // Save recipes if provided
             if ($request->has('recipes')) {
                 foreach ($request->recipes as $recipe) {
-                    if (!empty($recipe['material_id'])) {
-                        // Create recipe without timestamps
+                    if (!empty($recipe['material_id']) && !empty($recipe['quantity']) && !empty($recipe['unit'])) {
+                        // Validate unit compatibility
+                        $material = RawMaterial::find($recipe['material_id']);
+                        if (!$material) {
+                            throw new \Exception("Material not found");
+                        }
+
+                        // Check unit compatibility using helper
+                        $recipeUnit = $recipe['unit'];
+                        $materialUnit = $material->unit;
+
+                        if (!\App\Helpers\UnitConverter::areUnitsCompatible($recipeUnit, $materialUnit)) {
+                            throw new \Exception("Unit {$recipeUnit} is not compatible with material unit {$materialUnit} for {$material->name}");
+                        }
+
                         ProductRecipe::create([
                             'produk_id' => $produk->id,
                             'raw_material_id' => $recipe['material_id'],
@@ -116,7 +129,7 @@ class ProdukController extends Controller
 
             // Update recipes terlebih dahulu
             $oldRecipes = $produk->recipes()->get(); // Simpan resep lama
-            
+
             if ($request->has('recipes')) {
                 // Delete existing recipes
                 ProductRecipe::where('produk_id', $produk->id)->delete();
@@ -189,10 +202,10 @@ class ProdukController extends Controller
         DB::beginTransaction();
         try {
             $produk = Produk::findOrFail($id);
-            
+
             // Delete recipes first
             ProductRecipe::where('produk_id', $produk->id)->delete();
-            
+
             // Delete photo if exists
             if ($produk->foto && $produk->foto !== 'default_foto.jpg') {
                 $photoPath = public_path('img/produk/' . $produk->foto);
@@ -200,9 +213,9 @@ class ProdukController extends Controller
                     unlink($photoPath);
                 }
             }
-            
+
             $produk->delete();
-            
+
             DB::commit();
             return redirect()->route('produk.index')->with('success', 'Produk berhasil dihapus');
         } catch (\Exception $e) {

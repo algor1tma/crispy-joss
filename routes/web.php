@@ -18,6 +18,8 @@ use App\Models\Reservasi;
 use App\Models\transaksi;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SuperController;
+
 
 /*
 |---------------------------------------------------------------------------
@@ -39,14 +41,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('indexDashboard');
 
     //-------------------------------- MANAJEMEN KARYAWAN --------------------------------------
-    Route::prefix('karyawan')->middleware(['admin'])->group(function () {
-        Route::get('/', [KaryawanController::class, 'index'])->name('indexKaryawan');
-        Route::get('/create', [KaryawanController::class, 'create'])->name('createKaryawan');
-        Route::get('/edit/{id}', [KaryawanController::class, 'edit'])->name('editKaryawan');
-        Route::post('/store', [KaryawanController::class, 'store'])->name('storeKaryawan');
-        Route::put('/update/{id}', [KaryawanController::class, 'update'])->name('updateKaryawan'); // Menggunakan PUT
-        Route::delete('/delete/{id}', [KaryawanController::class, 'delete'])->name('deleteKaryawan');
-    });
+    // Route::prefix('karyawan')->middleware(['admin'])->group(function () {
+    //     Route::get('/', [KaryawanController::class, 'index'])->name('indexKaryawan');
+    //     Route::get('/create', [KaryawanController::class, 'create'])->name('createKaryawan');
+    //     Route::get('/edit/{id}', [KaryawanController::class, 'edit'])->name('editKaryawan');
+    //     Route::post('/store', [KaryawanController::class, 'store'])->name('storeKaryawan');
+    //     Route::put('/update/{id}', [KaryawanController::class, 'update'])->name('updateKaryawan'); // Menggunakan PUT
+    //     Route::delete('/delete/{id}', [KaryawanController::class, 'delete'])->name('deleteKaryawan');
+    // });
 
     //-------------------------------- PRODUK -------------------------------------------------
     Route::prefix('produk')->group(function () {
@@ -87,6 +89,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [PosController::class, 'index'])->name('pos.index');
         Route::post('/', [PosController::class, 'store'])->name('pos.store');
         Route::get('/receipt/{id}', [PosController::class, 'printReceipt'])->name('pos.receipt');
+        Route::post('/check-availability', [PosController::class, 'checkAvailability'])->name('pos.check-availability');
     });
 
     //-------------------------------- LAPORAN PENJUALAN -------------------------------------
@@ -119,4 +122,26 @@ Route::middleware(['auth', 'admin-karyawan'])->group(function () {
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('raw-materials-report', [RawMaterialController::class, 'report'])->name('raw-materials.report');
 });
+
+// Super user routes
+Route::middleware(['auth', 'super'])->group(function () {
+    Route::get('super/manage-users', [SuperController::class, 'manageUsers'])->name('super.manage-users');
+    Route::get('super/create-user', [SuperController::class, 'createUser'])->name('super.create-user');
+    Route::post('super/store-user', [SuperController::class, 'storeUser'])->name('super.store-user');
+    Route::get('super/edit-user/{id}', [SuperController::class, 'editUser'])->name('super.edit-user');
+    Route::put('super/update-user/{id}', [SuperController::class, 'updateUser'])->name('super.update-user');
+    Route::delete('super/delete-user/{id}', [SuperController::class, 'deleteUser'])->name('super.delete-user');
+});
+
+//-------------------------------- PRODUK -------------------------------------------------
+    Route::prefix('produk')->group(function () {
+        Route::get('/', [ProdukController::class, 'index'])->name('produk.index');
+        Route::middleware(['admin'])->group(function () {
+            Route::get('/create', [ProdukController::class, 'create'])->name('produk.create');
+            Route::post('/', [ProdukController::class, 'store'])->name('produk.store');
+            Route::get('/{id}/edit', [ProdukController::class, 'edit'])->name('produk.edit');
+            Route::put('/{id}', [ProdukController::class, 'update'])->name('produk.update');
+            Route::delete('/{id}', [ProdukController::class, 'destroy'])->name('produk.destroy');
+        });
+    });
 

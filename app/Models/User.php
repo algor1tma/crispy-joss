@@ -51,7 +51,7 @@ class User extends Authenticatable
     /**
      * Valid roles for the application
      */
-    const VALID_ROLES = ['admin', 'karyawan'];
+    const VALID_ROLES = ['admin', 'karyawan', 'super'];
 
     protected static function boot()
     {
@@ -61,6 +61,9 @@ class User extends Authenticatable
             // Soft delete related models when user is soft deleted
             if ($user->karyawan) {
                 $user->karyawan->delete();
+            }
+            if ($user->super) {
+                $user->super->delete();
             }
             // if ($user->pelanggan) {
             //     $user->pelanggan->delete();
@@ -78,6 +81,11 @@ class User extends Authenticatable
         return $this->hasOne(Admin::class);
     }
 
+    public function super()
+    {
+        return $this->hasOne(Super::class);
+    }
+
     public function suppliers()
     {
         return $this->hasMany(Supplier::class);
@@ -91,6 +99,8 @@ class User extends Authenticatable
     public function getProfileData()
     {
         switch ($this->roles) {
+            case 'super':
+                return $this->super;
             case 'admin':
                 return $this->admin;
             case 'karyawan':

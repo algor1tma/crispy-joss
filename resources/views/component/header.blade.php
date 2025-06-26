@@ -14,12 +14,11 @@
 
               <li class="nav-item dropdown pe-3">
 
-                  <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
-                      data-bs-toggle="dropdown">
+                  <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                       @if (auth()->user()->roles === 'karyawan')
-                          @if(auth()->user()->karyawan && auth()->user()->karyawan->foto)
-                              <img src="{{ asset('img/DataKaryawan/' . auth()->user()->karyawan->foto) }}" alt="Profile"
-                                  class="profile-photo">
+                          @if (auth()->user()->karyawan && auth()->user()->karyawan->foto)
+                              <img src="{{ asset('img/DataKaryawan/' . auth()->user()->karyawan->foto) }}"
+                                  alt="Profile" class="profile-photo">
                           @else
                               <img src="{{ asset('img/default-profile.png') }}" alt="Profile" class="profile-photo">
                           @endif
@@ -27,7 +26,9 @@
                           {{-- <img src="{{ asset('img/default-profile.png') }}" alt="Profile" class="profile-photo"> --}}
                       @endif
                       <span class="d-none d-md-block dropdown-toggle ps-2">
-                          @if (auth()->user()->roles === 'admin')
+                          @if (auth()->user()->roles === 'super')
+                              {{ auth()->user()->super?->nama ?? 'Super Admin' }}
+                          @elseif (auth()->user()->roles === 'admin')
                               {{ auth()->user()->admin?->nama ?? 'Admin' }}
                           @elseif (auth()->user()->roles === 'karyawan')
                               {{ auth()->user()->karyawan?->nama ?? 'Karyawan' }}
@@ -37,12 +38,15 @@
 
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                       <li class="dropdown-header">
-                          @if (auth()->user()->roles === 'admin')
+                          @if (auth()->user()->roles === 'super')
+                              <h6>{{ auth()->user()->super?->nama ?? 'Super Admin' }}</h6>
+                              <span>{{ ucfirst(auth()->user()->roles) }}</span>
+                          @elseif (auth()->user()->roles === 'admin')
                               <h6>{{ auth()->user()->admin?->nama ?? 'Admin' }}</h6>
-                              <span>{{ auth()->user()->roles }}</span>
+                              <span>{{ ucfirst(auth()->user()->roles) }}</span>
                           @elseif (auth()->user()->roles === 'karyawan')
                               <h6>{{ auth()->user()->karyawan?->nama ?? 'Karyawan' }}</h6>
-                              <span>{{ auth()->user()->roles }}</span>
+                              <span>{{ ucfirst(auth()->user()->roles) }}</span>
                           @endif
                       </li>
                       <li>

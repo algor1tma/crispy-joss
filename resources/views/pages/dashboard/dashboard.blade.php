@@ -1,7 +1,224 @@
 @extends('component.main')
 
 @section('content')
-    @if (auth()->user()->roles === 'admin')
+    @if (auth()->user()->roles === 'super')
+        <div class="pagetitle mb-4">
+            <h1>Dashboard Super Admin</h1>
+            <p class="text-secondary mb-0">Selamat datang <b>{{ $myData->nama }}</b></p>
+        </div>
+        <section class="section dashboard">
+            <div class="row g-4">
+                <!-- Left side columns -->
+                <div class="col-lg-12">
+                    <div class="row g-4">
+                        <!-- Total Users Card -->
+                        <div class="col-xxl-3 col-md-6">
+                            <div class="card info-card sales-card">
+                                <div class="card-body p-4">
+                                    <h5 class="card-title fw-bold mb-3">Total Users</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light">
+                                            <i class="bi bi-people text-primary"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h2 class="mb-0">{{ $totalUsers ?? 0 }}</h2>
+                                            <span class="text-muted small">total users</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Admins Card -->
+                        <div class="col-xxl-3 col-md-6">
+                            <div class="card info-card sales-card">
+                                <div class="card-body p-4">
+                                    <h5 class="card-title fw-bold mb-3">Admin</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success-light">
+                                            <i class="bi bi-person-badge text-success"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h2 class="mb-0">{{ $totalAdmins ?? 0 }}</h2>
+                                            <span class="text-muted small">admin users</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Karyawan Card -->
+                        <div class="col-xxl-3 col-md-6">
+                            <div class="card info-card sales-card">
+                                <div class="card-body p-4">
+                                    <h5 class="card-title fw-bold mb-3">Karyawan</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-info-light">
+                                            <i class="bi bi-person text-info"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h2 class="mb-0">{{ $totalKaryawan ?? 0 }}</h2>
+                                            <span class="text-muted small">karyawan users</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions Card -->
+                        <div class="col-xxl-3 col-md-6">
+                            <div class="card info-card sales-card">
+                                <div class="card-body p-4">
+                                    <h5 class="card-title fw-bold mb-3">Quick Actions</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-warning-light">
+                                            <i class="bi bi-plus-circle text-warning"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <a href="{{ route('super.create-user') }}" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-plus"></i> Add User
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Users Card -->
+                        <div class="col-xxl-8 col-xl-12">
+                            <div class="card h-100">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <h5 class="card-title fw-bold mb-0">Recent Users</h5>
+                                        <a href="{{ route('super.manage-users') }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> View All
+                                        </a>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Role</th>
+                                                    <th class="text-center">Status</th>
+                                                    <th class="text-center">Created</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($recentUsers as $user)
+                                                    <tr>
+                                                        <td class="fw-medium">
+                                                            {{ $user->admin->nama ?? ($user->karyawan->nama ?? 'N/A') }}
+                                                        </td>
+                                                        <td>{{ $user->email }}</td>
+                                                        <td>
+                                                            <span
+                                                                class="badge bg-{{ $user->roles === 'admin' ? 'success' : 'info' }}">
+                                                                {{ ucfirst($user->roles) }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge bg-success">Active</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            {{ $user->created_at->format('d M Y') }}
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="5" class="text-center py-4 text-muted">
+                                                            No users found
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Management Menu Card -->
+                        <div class="col-xxl-4 col-xl-12">
+                            <div class="card h-100">
+                                <div class="card-body p-4">
+                                    <h5 class="card-title fw-bold mb-4">Management Menu</h5>
+                                    <div class="list-group list-group-flush">
+                                        <a href="{{ route('super.manage-users') }}"
+                                            class="list-group-item list-group-item-action d-flex align-items-center">
+                                            <i class="bi bi-people me-3 text-primary"></i>
+                                            <div>
+                                                <div class="fw-medium">Manage Users</div>
+                                                <small class="text-muted">View, edit, and delete users</small>
+                                            </div>
+                                        </a>
+                                        <a href="{{ route('super.create-user') }}"
+                                            class="list-group-item list-group-item-action d-flex align-items-center">
+                                            <i class="bi bi-person-plus me-3 text-success"></i>
+                                            <div>
+                                                <div class="fw-medium">Add New User</div>
+                                                <small class="text-muted">Create admin or karyawan account</small>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        @push('scripts')
+            <style>
+                .bg-primary-light {
+                    background-color: rgba(65, 84, 241, 0.1);
+                }
+
+                .bg-success-light {
+                    background-color: rgba(40, 167, 69, 0.1);
+                }
+
+                .bg-danger-light {
+                    background-color: rgba(220, 53, 69, 0.1);
+                }
+
+                .bg-info-light {
+                    background-color: rgba(13, 202, 240, 0.1);
+                }
+
+                .bg-warning-light {
+                    background-color: rgba(255, 193, 7, 0.1);
+                }
+
+                .card-icon {
+                    width: 50px;
+                    height: 50px;
+                    font-size: 24px;
+                }
+
+                .info-card h2 {
+                    font-size: 28px;
+                    font-weight: 700;
+                }
+
+                .table> :not(caption)>*>* {
+                    padding: 0.75rem 1rem;
+                }
+
+                .badge {
+                    padding: 0.5em 0.8em;
+                    font-weight: 500;
+                }
+            </style>
+        @endpush
+    @elseif (auth()->user()->roles === 'admin')
         <div class="pagetitle mb-4">
             <h1>Dashboard Admin</h1>
             <p class="text-secondary mb-0">Selamat datang <b>{{ $myData->nama }}</b></p>
@@ -15,9 +232,11 @@
                         <div class="col-xxl-3 col-md-6">
                             <div class="card info-card sales-card">
                                 <div class="card-body p-4">
-                                    <h5 class="card-title fw-bold mb-3">Transaksi <span class="text-secondary fw-normal">| Hari ini</span></h5>
+                                    <h5 class="card-title fw-bold mb-3">Transaksi <span class="text-secondary fw-normal">|
+                                            Hari ini</span></h5>
                                     <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light">
                                             <i class="bi bi-cart text-primary"></i>
                                         </div>
                                         <div class="ps-3">
@@ -33,13 +252,16 @@
                         <div class="col-xxl-3 col-md-6">
                             <div class="card info-card sales-card">
                                 <div class="card-body p-4">
-                                    <h5 class="card-title fw-bold mb-3">Pendapatan <span class="text-secondary fw-normal">| Bulan ini</span></h5>
+                                    <h5 class="card-title fw-bold mb-3">Pendapatan <span
+                                            class="text-secondary fw-normal">| Bulan ini</span></h5>
                                     <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success-light">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success-light">
                                             <i class="bi bi-coin text-success"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h2 class="mb-0">Rp{{ number_format($monthlyRevenue ?? 0, 0, ',', '.') }}</h2>
+                                            <h2 class="mb-0">Rp{{ number_format($monthlyRevenue ?? 0, 0, ',', '.') }}
+                                            </h2>
                                             <span class="text-muted small">rupiah</span>
                                         </div>
                                     </div>
@@ -51,13 +273,16 @@
                         <div class="col-xxl-3 col-md-6">
                             <div class="card info-card sales-card">
                                 <div class="card-body p-4">
-                                    <h5 class="card-title fw-bold mb-3">Pengeluaran <span class="text-secondary fw-normal">| Bulan ini</span></h5>
+                                    <h5 class="card-title fw-bold mb-3">Pengeluaran <span
+                                            class="text-secondary fw-normal">| Bulan ini</span></h5>
                                     <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-danger-light">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-danger-light">
                                             <i class="bi bi-cash text-danger"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h2 class="mb-0">Rp{{ number_format($monthlyExpenses ?? 0, 0, ',', '.') }}</h2>
+                                            <h2 class="mb-0">Rp{{ number_format($monthlyExpenses ?? 0, 0, ',', '.') }}
+                                            </h2>
                                             <span class="text-muted small">rupiah</span>
                                         </div>
                                     </div>
@@ -71,14 +296,17 @@
                                 <div class="card-body p-4">
                                     <h5 class="card-title fw-bold mb-3">Pengguna Aktif</h5>
                                     <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-info-light">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-info-light">
                                             <i class="bi bi-people text-info"></i>
                                         </div>
                                         <div class="ps-3">
                                             <h2 class="mb-0">{{ $userStats['active'] ?? 0 }}</h2>
                                             <div class="mt-2">
-                                                <span class="badge bg-primary me-2">Admin: {{ $userStats['admin'] ?? 0 }}</span>
-                                                <span class="badge bg-secondary">Kasir: {{ $userStats['kasir'] ?? 0 }}</span>
+                                                <span class="badge bg-primary me-2">Admin:
+                                                    {{ $userStats['admin'] ?? 0 }}</span>
+                                                <span class="badge bg-secondary">Kasir:
+                                                    {{ $userStats['kasir'] ?? 0 }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -134,8 +362,10 @@
                                                 @forelse($lowStockMaterials as $material)
                                                     <tr>
                                                         <td class="fw-medium">{{ $material->name }}</td>
-                                                        <td class="text-center">{{ $material->current_stock }} {{ $material->unit }}</td>
-                                                        <td class="text-center">{{ $material->minimum_stock }} {{ $material->unit }}</td>
+                                                        <td class="text-center">{{ $material->current_stock }}
+                                                            {{ $material->unit }}</td>
+                                                        <td class="text-center">{{ $material->minimum_stock }}
+                                                            {{ $material->unit }}</td>
                                                         <td class="text-center">
                                                             <span class="badge bg-danger">Stok Rendah</span>
                                                         </td>
@@ -143,7 +373,8 @@
                                                 @empty
                                                     <tr>
                                                         <td colspan="4" class="text-center py-4 text-muted">
-                                                            <i class="bi bi-info-circle me-2"></i>Tidak ada bahan baku yang menipis
+                                                            <i class="bi bi-info-circle me-2"></i>Tidak ada bahan baku yang
+                                                            menipis
                                                         </td>
                                                     </tr>
                                                 @endforelse
@@ -174,7 +405,8 @@
                                                     <tr>
                                                         <td class="fw-medium">{{ $product->nama_produk }}</td>
                                                         <td>{{ $product->material_name }}</td>
-                                                        <td class="text-center">{{ $product->current_stock }} / {{ $product->minimum_stock }}</td>
+                                                        <td class="text-center">{{ $product->current_stock }} /
+                                                            {{ $product->minimum_stock }}</td>
                                                         <td class="text-center">
                                                             <span class="badge bg-warning">Perlu Perhatian</span>
                                                         </td>
@@ -182,7 +414,8 @@
                                                 @empty
                                                     <tr>
                                                         <td colspan="4" class="text-center py-4 text-muted">
-                                                            <i class="bi bi-info-circle me-2"></i>Tidak ada produk dengan bahan baku menipis
+                                                            <i class="bi bi-info-circle me-2"></i>Tidak ada produk dengan
+                                                            bahan baku menipis
                                                         </td>
                                                     </tr>
                                                 @endforelse
@@ -197,7 +430,8 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body p-4">
-                                    <h5 class="card-title fw-bold mb-4">Pendapatan <span class="text-secondary fw-normal">| 30 Hari Terakhir</span></h5>
+                                    <h5 class="card-title fw-bold mb-4">Pendapatan <span
+                                            class="text-secondary fw-normal">| 30 Hari Terakhir</span></h5>
                                     <div id="revenueChart" class="chart-container"></div>
                                 </div>
                             </div>
@@ -209,121 +443,135 @@
         </section>
 
         @push('scripts')
-        <script>
-            var options = {
-                series: [{
-                    name: 'Pendapatan',
-                    data: @json($revenueData['amounts'] ?? [])
-                }],
-                chart: {
-                    type: 'area',
-                    height: 350,
-                    zoom: {
+            <script>
+                var options = {
+                    series: [{
+                        name: 'Pendapatan',
+                        data: @json($revenueData['amounts'] ?? [])
+                    }],
+                    chart: {
+                        type: 'area',
+                        height: 350,
+                        zoom: {
+                            enabled: false
+                        },
+                        toolbar: {
+                            show: false
+                        }
+                    },
+                    dataLabels: {
                         enabled: false
                     },
-                    toolbar: {
-                        show: false
-                    }
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    curve: 'smooth',
-                    width: 2
-                },
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.7,
-                        opacityTo: 0.3,
-                        stops: [0, 90, 100]
-                    }
-                },
-                grid: {
-                    borderColor: '#f1f1f1',
-                    row: {
-                        colors: ['transparent'],
-                        opacity: 0.5
+                    stroke: {
+                        curve: 'smooth',
+                        width: 2
                     },
-                    padding: {
-                        top: 10,
-                        right: 10,
-                        bottom: 10,
-                        left: 10
-                    }
-                },
-                xaxis: {
-                    categories: @json($revenueData['dates'] ?? []),
-                    labels: {
-                        rotate: -45,
-                        rotateAlways: true,
-                        style: {
-                            fontSize: '12px',
-                            fontFamily: 'inherit'
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.7,
+                            opacityTo: 0.3,
+                            stops: [0, 90, 100]
                         }
                     },
-                    axisBorder: {
-                        show: false
-                    }
-                },
-                yaxis: {
-                    labels: {
-                        formatter: function(value) {
-                            return 'Rp' + value.toLocaleString('id-ID');
+                    grid: {
+                        borderColor: '#f1f1f1',
+                        row: {
+                            colors: ['transparent'],
+                            opacity: 0.5
                         },
-                        style: {
-                            fontSize: '12px',
-                            fontFamily: 'inherit'
+                        padding: {
+                            top: 10,
+                            right: 10,
+                            bottom: 10,
+                            left: 10
                         }
-                    }
-                },
-                tooltip: {
-                    y: {
-                        formatter: function(value) {
-                            return 'Rp' + value.toLocaleString('id-ID');
+                    },
+                    xaxis: {
+                        categories: @json($revenueData['dates'] ?? []),
+                        labels: {
+                            rotate: -45,
+                            rotateAlways: true,
+                            style: {
+                                fontSize: '12px',
+                                fontFamily: 'inherit'
+                            }
+                        },
+                        axisBorder: {
+                            show: false
                         }
-                    }
-                },
-                colors: ['#4154f1']
-            };
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function(value) {
+                                return 'Rp' + value.toLocaleString('id-ID');
+                            },
+                            style: {
+                                fontSize: '12px',
+                                fontFamily: 'inherit'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function(value) {
+                                return 'Rp' + value.toLocaleString('id-ID');
+                            }
+                        }
+                    },
+                    colors: ['#4154f1']
+                };
 
-            var chart = new ApexCharts(document.querySelector("#revenueChart"), options);
-            chart.render();
-        </script>
+                var chart = new ApexCharts(document.querySelector("#revenueChart"), options);
+                chart.render();
+            </script>
 
-        <style>
-            .bg-primary-light { background-color: rgba(65, 84, 241, 0.1); }
-            .bg-success-light { background-color: rgba(40, 167, 69, 0.1); }
-            .bg-danger-light { background-color: rgba(220, 53, 69, 0.1); }
-            .bg-info-light { background-color: rgba(13, 202, 240, 0.1); }
-            .bg-warning-light { background-color: rgba(255, 193, 7, 0.1); }
+            <style>
+                .bg-primary-light {
+                    background-color: rgba(65, 84, 241, 0.1);
+                }
 
-            .card-icon {
-                width: 50px;
-                height: 50px;
-                font-size: 24px;
-            }
+                .bg-success-light {
+                    background-color: rgba(40, 167, 69, 0.1);
+                }
 
-            .info-card h2 {
-                font-size: 28px;
-                font-weight: 700;
-            }
+                .bg-danger-light {
+                    background-color: rgba(220, 53, 69, 0.1);
+                }
 
-            .chart-container {
-                min-height: 400px;
-            }
+                .bg-info-light {
+                    background-color: rgba(13, 202, 240, 0.1);
+                }
 
-            .table > :not(caption) > * > * {
-                padding: 0.75rem 1rem;
-            }
+                .bg-warning-light {
+                    background-color: rgba(255, 193, 7, 0.1);
+                }
 
-            .badge {
-                padding: 0.5em 0.8em;
-                font-weight: 500;
-            }
-        </style>
+                .card-icon {
+                    width: 50px;
+                    height: 50px;
+                    font-size: 24px;
+                }
+
+                .info-card h2 {
+                    font-size: 28px;
+                    font-weight: 700;
+                }
+
+                .chart-container {
+                    min-height: 400px;
+                }
+
+                .table> :not(caption)>*>* {
+                    padding: 0.75rem 1rem;
+                }
+
+                .badge {
+                    padding: 0.5em 0.8em;
+                    font-weight: 500;
+                }
+            </style>
         @endpush
     @elseif (auth()->user()->roles === 'karyawan')
         <div class="pagetitle mb-4">
@@ -338,9 +586,11 @@
                         <div class="col-xxl-6 col-md-8">
                             <div class="card info-card h-100">
                                 <div class="card-body p-4">
-                                    <h5 class="card-title fw-bold mb-3">Transaksi <span class="text-secondary fw-normal">| Hari ini</span></h5>
+                                    <h5 class="card-title fw-bold mb-3">Transaksi <span class="text-secondary fw-normal">|
+                                            Hari ini</span></h5>
                                     <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light">
                                             <i class="bi bi-cart text-primary"></i>
                                         </div>
                                         <div class="ps-3">
@@ -348,7 +598,8 @@
                                             <span class="text-muted small">transaksi</span>
                                         </div>
                                         <div class="ms-auto">
-                                            <img src="{{ asset('img/iconcriospyy.png') }}" alt="Icon"  style="width: 80; height: 80px; object-fit: cover;">
+                                            <img src="{{ asset('img/iconcriospyy.png') }}" alt="Icon"
+                                                style="width: 80; height: 80px; object-fit: cover;">
                                         </div>
                                     </div>
                                 </div>
@@ -403,8 +654,10 @@
                                                 @forelse($lowStockMaterials as $material)
                                                     <tr>
                                                         <td class="fw-medium">{{ $material->name }}</td>
-                                                        <td class="text-center">{{ $material->current_stock }} {{ $material->unit }}</td>
-                                                        <td class="text-center">{{ $material->minimum_stock }} {{ $material->unit }}</td>
+                                                        <td class="text-center">{{ $material->current_stock }}
+                                                            {{ $material->unit }}</td>
+                                                        <td class="text-center">{{ $material->minimum_stock }}
+                                                            {{ $material->unit }}</td>
                                                         <td class="text-center">
                                                             <span class="badge bg-danger">Stok Rendah</span>
                                                         </td>
@@ -412,7 +665,8 @@
                                                 @empty
                                                     <tr>
                                                         <td colspan="4" class="text-center py-4 text-muted">
-                                                            <i class="bi bi-info-circle me-2"></i>Tidak ada bahan baku yang menipis
+                                                            <i class="bi bi-info-circle me-2"></i>Tidak ada bahan baku yang
+                                                            menipis
                                                         </td>
                                                     </tr>
                                                 @endforelse
@@ -443,7 +697,8 @@
                                                     <tr>
                                                         <td class="fw-medium">{{ $product->nama_produk }}</td>
                                                         <td>{{ $product->material_name }}</td>
-                                                        <td class="text-center">{{ $product->current_stock }} / {{ $product->minimum_stock }}</td>
+                                                        <td class="text-center">{{ $product->current_stock }} /
+                                                            {{ $product->minimum_stock }}</td>
                                                         <td class="text-center">
                                                             <span class="badge bg-warning">Perlu Perhatian</span>
                                                         </td>
@@ -451,7 +706,8 @@
                                                 @empty
                                                     <tr>
                                                         <td colspan="4" class="text-center py-4 text-muted">
-                                                            <i class="bi bi-info-circle me-2"></i>Tidak ada produk dengan bahan baku menipis
+                                                            <i class="bi bi-info-circle me-2"></i>Tidak ada produk dengan
+                                                            bahan baku menipis
                                                         </td>
                                                     </tr>
                                                 @endforelse
@@ -464,7 +720,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </section>
     @elseif (auth()->user()->roles === 'pelanggan')
         <div class="pagetitle mb-4">
@@ -481,7 +737,8 @@
                                 <div class="card-body p-4">
                                     <h5 class="card-title fw-bold mb-3">Poin Anda</h5>
                                     <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success-light">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success-light">
                                             <i class="bi bi-coin text-success"></i>
                                         </div>
                                         <div class="ps-3">
@@ -497,9 +754,11 @@
                         <div class="col-md-6">
                             <div class="card info-card h-100">
                                 <div class="card-body p-4">
-                                    <h5 class="card-title fw-bold mb-3">Reservasi <span class="text-secondary fw-normal">| Mendatang</span></h5>
+                                    <h5 class="card-title fw-bold mb-3">Reservasi <span class="text-secondary fw-normal">|
+                                            Mendatang</span></h5>
                                     <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-primary-light">
                                             <i class="bi bi-calendar-check text-primary"></i>
                                         </div>
                                         <div class="ps-3">

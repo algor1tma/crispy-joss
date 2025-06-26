@@ -8,19 +8,6 @@ return new class extends Migration
 {
     public function up()
     {
-        // Create users table first
-        if (!Schema::hasTable('users')) {
-            Schema::create('users', function (Blueprint $table) {
-                $table->id();
-                $table->string('email')->unique();
-                $table->string('password');
-                $table->enum('roles', ['admin', 'karyawan', 'pelanggan'])->default('pelanggan');
-                $table->rememberToken();
-                $table->timestamps();
-            });
-        }
-
-        // Create produks table
         Schema::create('produks', function (Blueprint $table) {
             $table->id();
             $table->string('nama_produk');
@@ -32,13 +19,13 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // Create raw_materials table
         Schema::create('raw_materials', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->decimal('price', 10, 2);
             $table->decimal('stock', 10, 2)->default(0);
-            $table->string('unit');
+            $table->decimal('minimum_stock', 10, 2)->default(10);
+            $table->enum('unit', ['g', 'kg', 'ml', 'l', 'pcs']);
             $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -47,6 +34,7 @@ return new class extends Migration
         // Create suppliers table
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('name');
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
@@ -59,7 +47,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('raw_material_id')->constrained('raw_materials')->onDelete('cascade');
             $table->foreignId('supplier_id')->nullable()->constrained('suppliers')->onDelete('set null');
-            $table->enum('type', ['in', 'out']);
+            $table->enum('type', ['in', 'out', 'adjustment', 'production', 'expired', 'damaged']);
             $table->decimal('quantity', 10, 2);
             $table->decimal('price', 10, 2)->nullable();
             $table->decimal('subtotal', 10, 2)->default(0);
@@ -73,8 +61,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('produk_id')->constrained('produks')->onDelete('cascade');
             $table->foreignId('raw_material_id')->constrained('raw_materials')->onDelete('cascade');
-            $table->decimal('quantity', 10, 2);
-            $table->string('unit');
+            $table->decimal('quantity', 10, 3);
+            $table->enum('unit', ['g', 'kg', 'ml', 'l', 'pcs']);
             $table->text('notes')->nullable();
             $table->timestamps();
         });
@@ -116,4 +104,4 @@ return new class extends Migration
         Schema::dropIfExists('produks');
         // Don't drop users table as it might be needed by other parts
     }
-}; 
+};
