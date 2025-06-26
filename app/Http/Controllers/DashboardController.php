@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Admin;
 use App\Models\Karyawan;
 use App\Models\Pelanggan;
+use App\Models\Super;
 use App\Models\Transaksi;
 use App\Models\User;
 use App\Models\Produk;
@@ -20,22 +21,44 @@ class DashboardController extends Controller
     public function index()
     {
         $myData = auth()->user();
-        
-        if ($myData->roles === 'admin') {
+
+        if ($myData->roles === 'super') {
+            $myData = Super::where('user_id', auth()->id())->first();
+
+            // Get statistics for super dashboard
+            $totalUsers = User::whereIn('roles', ['admin', 'karyawan'])->count();
+            $totalAdmins = User::where('roles', 'admin')->count();
+            $totalKaryawan = User::where('roles', 'karyawan')->count();
+
+            // Get recent users
+            $recentUsers = User::whereIn('roles', ['admin', 'karyawan'])
+                ->with(['admin', 'karyawan'])
+                ->latest()
+                ->take(5)
+                ->get();
+
+            return view('pages.dashboard.dashboard', compact(
+                'myData',
+                'totalUsers',
+                'totalAdmins',
+                'totalKaryawan',
+                'recentUsers'
+            ));
+        } elseif ($myData->roles === 'admin') {
             // Get daily transactions count
             $dailyTransactions = Transaksi::whereDate('tanggal_transaksi', Carbon::today())->count();
-            
+
             // Get monthly revenue and expenses
             $monthlyRevenue = Transaksi::whereYear('tanggal_transaksi', Carbon::now()->year)
                 ->whereMonth('tanggal_transaksi', Carbon::now()->month)
                 ->sum('total_harga');
-            
+
             $monthlyExpenses = DB::table('raw_material_logs')
                 ->where('type', 'in')
                 ->whereYear('created_at', Carbon::now()->year)
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->sum('subtotal');
-            
+
             // Get user statistics
             $userStats = [
                 'total' => User::count(),
@@ -43,7 +66,7 @@ class DashboardController extends Controller
                 'kasir' => User::where('roles', 'karyawan')->count(),
                 'active' => User::whereIn('roles', ['admin', 'karyawan'])->count()
             ];
-            
+
             // Get product recipe statistics
             $productRecipeStats = [
                 'total_products' => Produk::count(),
@@ -97,7 +120,7 @@ class DashboardController extends Controller
                     ->orderBy('total_terjual', 'desc')
                     ->first()
             ];
-            
+
             return view('pages.dashboard.dashboard', compact(
                 'myData',
                 'dailyTransactions',
@@ -113,7 +136,7 @@ class DashboardController extends Controller
         } elseif ($myData->roles === 'karyawan') {
             // Get daily transactions count for karyawan
             $dailyTransactions = Transaksi::whereDate('tanggal_transaksi', Carbon::today())->count();
-            
+
             // Get product recipe statistics
             $productRecipeStats = [
                 'total_products' => Produk::count(),
@@ -143,9 +166,9 @@ class DashboardController extends Controller
                 )
                 ->whereRaw('raw_materials.stock <= 10')
                 ->get();
-            
+
             return view('pages.dashboard.dashboard', compact(
-                'myData', 
+                'myData',
                 'dailyTransactions',
                 'productRecipeStats',
                 'lowStockMaterials',
@@ -156,8 +179,30 @@ class DashboardController extends Controller
             $countReservasi = Transaksi::where('pelanggan_id', $myData->id)
                 ->whereDate('tanggal_transaksi', '>=', Carbon::today())
                 ->count();
-            
+
             return view('pages.dashboard.dashboard', compact('myData', 'countReservasi'));
+        } elseif ($myData->roles === 'super') {
+            // Get all data for super admin
+            $totalTransaksi = Transaksi::count();
+            $totalUser = User::count();
+            $totalProduk = Produk::count();
+            $totalMaterial = RawMaterial::count();
+
+            // Get daily, monthly, and yearly statistics
+            $dailyStats = $this->getDailyStats();
+            $monthlyStats = $this->getMonthlyStats();
+            $yearlyStats = $this->getYearlyStats();
+
+            return view('pages.dashboard.dashboard', compact(
+                'myData',
+                'totalTransaksi',
+                'totalUser',
+                'totalProduk',
+                'totalMaterial',
+                'dailyStats',
+                'monthlyStats',
+                'yearlyStats'
+            ));
         }
     }
 
@@ -165,19 +210,34 @@ class DashboardController extends Controller
     {
         $dates = [];
         $amounts = [];
-        
+
         for ($i = 29; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
             $amount = Transaksi::whereDate('tanggal_transaksi', $date)
                 ->sum('total_harga');
-            
+
             $dates[] = $date->format('d M');
             $amounts[] = $amount;
         }
-        
+
         return [
             'dates' => $dates,
             'amounts' => $amounts
         ];
+    }
+
+    private function getDailyStats()
+    {
+        // Implementasi pengambilan data statistik harian
+    }
+
+    private function getMonthlyStats()
+    {
+        // Implementasi pengambilan data statistik bulanan
+    }
+
+    private function getYearlyStats()
+    {
+        // Implementasi pengambilan data statistik tahunan
     }
 }
