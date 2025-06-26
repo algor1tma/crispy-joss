@@ -24,11 +24,10 @@
                             @method('PUT')
 
                             <!-- Account Information -->
-                            <div class="col-12">
+                            {{-- <div class="col-12">
                                 <h6 class="fw-bold text-primary border-bottom pb-2">Account Information</h6>
-                            </div>
-
-                            <div class="col-md-6">
+                            </div> --}}
+                            {{-- <div class="col-md-6">
                                 <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror"
                                     id="email" name="email" value="{{ old('email', $user->email) }}" required
@@ -37,39 +36,12 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                                 <div class="form-text">Masukkan alamat email yang valid</div>
-                            </div>
+                            </div> --}}
 
-                            <div class="col-md-6">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                    id="password" name="password" minlength="6"
-                                    placeholder="Kosongkan jika tidak ingin mengubah password">
-                                @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div class="form-text">Kosongkan jika tidak ingin mengubah password (minimal 6 karakter jika
-                                    diisi)</div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="roles" class="form-label">Role <span class="text-danger">*</span></label>
-                                <select class="form-select @error('roles') is-invalid @enderror" id="roles"
-                                    name="roles" required>
-                                    <option value="">Choose Role</option>
-                                    <option value="admin" {{ old('roles', $user->roles) === 'admin' ? 'selected' : '' }}>
-                                        Admin</option>
-                                    <option value="karyawan"
-                                        {{ old('roles', $user->roles) === 'karyawan' ? 'selected' : '' }}>Karyawan</option>
-                                </select>
-                                @error('roles')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <!-- Personal Information -->
+                            {{-- <!-- Personal Information -->
                             <div class="col-12 mt-4">
                                 <h6 class="fw-bold text-primary border-bottom pb-2">Personal Information</h6>
-                            </div>
+                            </div> --}}
 
                             @php
                                 $profile = $user->admin ?? $user->karyawan;
@@ -106,6 +78,33 @@
                                 <textarea class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" rows="3"
                                     required>{{ old('alamat', $profile->alamat ?? '') }}</textarea>
                                 @error('alamat')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                    id="password" name="password" minlength="6"
+                                    placeholder="Kosongkan jika tidak ingin mengubah password">
+                                @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text">Kosongkan jika tidak ingin mengubah password (minimal 6 karakter jika
+                                    diisi)</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="roles" class="form-label">Role <span class="text-danger">*</span></label>
+                                <select class="form-select @error('roles') is-invalid @enderror" id="roles"
+                                    name="roles" required>
+                                    <option value="">Choose Role</option>
+                                    <option value="admin" {{ old('roles', $user->roles) === 'admin' ? 'selected' : '' }}>
+                                        Admin</option>
+                                    <option value="karyawan"
+                                        {{ old('roles', $user->roles) === 'karyawan' ? 'selected' : '' }}>Karyawan</option>
+                                </select>
+                                @error('roles')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

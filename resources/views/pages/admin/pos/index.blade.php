@@ -207,6 +207,8 @@
 @endsection
 
 @push('scripts')
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
             let cart = [];
@@ -275,7 +277,11 @@
             // Process transaction
             $('#process-transaction').click(function() {
                 if (cart.length === 0) {
-                    alert('Keranjang belanja kosong!');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Keranjang kosong',
+                        text: 'Keranjang belanja kosong!'
+                    });
                     return;
                 }
 
@@ -335,41 +341,37 @@
                         total_harga: calculateTotal()
                     },
                     success: function(response) {
-                        if (response.success) {
-                            // Load receipt
-                            $.get("{{ url('pos/receipt') }}/" + response.transaction_id,
-                                function(data) {
-                                    $('#receipt-content').html(data);
-                                    $('#receiptModal').modal('show');
-                                });
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: response.message || 'Transaksi berhasil.'
+                        });
 
-                            // Reset cart and form
-                            cart = [];
-                            updateCart();
-                            $('#customer_name').val('');
-                            $('#customer_phone').val('');
-
-                            // Only reload page after modal is closed
-                            $('#receiptModal').on('hidden.bs.modal', function() {
-                                location.reload();
+                        // Load receipt
+                        $.get("{{ url('pos/receipt') }}/" + response.transaction_id,
+                            function(data) {
+                                $('#receipt-content').html(data);
+                                $('#receiptModal').modal('show');
                             });
-                        } else {
-                            alert('Gagal menyimpan transaksi: ' + (response.message ||
-                                'Terjadi kesalahan'));
-                        }
+
+                        // Reset cart and form
+                        cart = [];
+                        updateCart();
+                        $('#customer_name').val('');
+                        $('#customer_phone').val('');
+
+                        // Only reload page after modal is closed
+                        $('#receiptModal').on('hidden.bs.modal', function() {
+                            location.reload();
+                        });
                     },
                     error: function(xhr) {
-                        console.error('Error:', xhr.responseText);
-                        let errorMessage = 'Terjadi kesalahan saat menyimpan transaksi!';
-                        try {
-                            const response = JSON.parse(xhr.responseText);
-                            if (response.message) {
-                                errorMessage = response.message;
-                            }
-                        } catch (e) {
-                            console.error('Error parsing response:', e);
-                        }
-                        alert(errorMessage);
+                        let errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Terjadi kesalahan.';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: errorMsg
+                        });
                     },
                     complete: function() {
                         // Reset button state

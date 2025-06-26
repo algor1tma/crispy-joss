@@ -20,7 +20,7 @@
                               <img src="{{ asset('img/DataKaryawan/' . auth()->user()->karyawan->foto) }}"
                                   alt="Profile" class="profile-photo">
                           @else
-                              <img src="{{ asset('img/default-profile.png') }}" alt="Profile" class="profile-photo">
+                              <img src="{{ asset('img\default_image.jpg') }}" alt="Profile" class="profile-photo" >
                           @endif
                       @else
                           {{-- <img src="{{ asset('img/default-profile.png') }}" alt="Profile" class="profile-photo"> --}}

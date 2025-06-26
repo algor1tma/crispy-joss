@@ -152,7 +152,7 @@
                                                                         @endif
                                                                     </td>
                                                                     <td class="text-end">
-                                                                        {{ number_format($log->quantity, 2) }} {{ $log->rawMaterial->unit }}
+                                                                        {{ number_format($log->quantity) }} {{ $log->rawMaterial->unit }}
                                                                     </td>
                                                                     <td class="text-end">
                                                                         Rp {{ number_format($log->price, 0, ',', '.') }}

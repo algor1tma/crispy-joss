@@ -24,7 +24,7 @@ class ProfileController extends Controller
         // Validasi input
         $rules = [
             'nama' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            // 'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6|confirmed',
         ];
 
@@ -38,7 +38,7 @@ class ProfileController extends Controller
         // Update user email dan password
         User::where('id', $user->id)
             ->update([
-                'email' => $request->email,
+                // 'email' => $request->email,
                 'password' => $request->filled('password') ? Hash::make($request->password) : $user->password
             ]);
 

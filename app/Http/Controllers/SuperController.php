@@ -29,13 +29,7 @@ class SuperController extends Controller
             ->take(5)
             ->get();
 
-        return view('pages.super.dashboard', compact(
-            'myData',
-            'totalUsers',
-            'totalAdmins',
-            'totalKaryawan',
-            'recentUsers'
-        ));
+        return view('pages.super.dashboard', compact('myData', 'totalUsers', 'totalAdmins', 'totalKaryawan', 'recentUsers'));
     }
 
     public function manageUsers()
@@ -56,21 +50,22 @@ class SuperController extends Controller
     public function storeUser(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|unique:users,email',
+            // 'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             'roles' => 'required|in:admin,karyawan',
             'nama' => 'required|string|max:255',
             'no_telp' => 'required|string|max:20',
-            'alamat' => 'required|string'
+            'alamat' => 'required|string',
         ]);
 
         DB::beginTransaction();
         try {
             // Create user
             $user = User::create([
-                'email' => $request->email,
+                // 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'roles' => $request->roles
+                'roles' => $request->roles,
+                'username' => $request->nama, 
             ]);
 
             // Create profile based on role
@@ -79,21 +74,20 @@ class SuperController extends Controller
                     'user_id' => $user->id,
                     'nama' => $request->nama,
                     'no_telp' => $request->no_telp,
-                    'alamat' => $request->alamat
+                    'alamat' => $request->alamat,
                 ]);
             } else {
                 Karyawan::create([
                     'user_id' => $user->id,
                     'nama' => $request->nama,
                     'no_telp' => $request->no_telp,
-                    'alamat' => $request->alamat
+                    'alamat' => $request->alamat,
                 ]);
             }
 
             DB::commit();
             Alert::success('Berhasil', 'User berhasil ditambahkan');
             return redirect()->route('super.manage-users');
-
         } catch (\Exception $e) {
             DB::rollback();
             Alert::error('Gagal', 'Terjadi kesalahan saat menambahkan user');
@@ -118,20 +112,21 @@ class SuperController extends Controller
         $user = User::findOrFail($id);
 
         $request->validate([
-            'email' => 'required|email|unique:users,email,' . $id,
+            // 'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'nullable|min:6',
             'roles' => 'required|in:admin,karyawan',
             'nama' => 'required|string|max:255',
             'no_telp' => 'required|string|max:20',
-            'alamat' => 'required|string'
+            'alamat' => 'required|string',
         ]);
 
         DB::beginTransaction();
         try {
             // Update user
             $userData = [
-                'email' => $request->email,
-                'roles' => $request->roles
+                // 'email' => $request->email,
+                'roles' => $request->roles,
+                'username' => $request->nama, 
             ];
 
             if ($request->filled('password')) {
@@ -144,7 +139,7 @@ class SuperController extends Controller
             $profileData = [
                 'nama' => $request->nama,
                 'no_telp' => $request->no_telp,
-                'alamat' => $request->alamat
+                'alamat' => $request->alamat,
             ];
 
             // If role changed, delete old profile and create new one
@@ -173,7 +168,6 @@ class SuperController extends Controller
             DB::commit();
             Alert::success('Berhasil', 'User berhasil diperbarui');
             return redirect()->route('super.manage-users');
-
         } catch (\Exception $e) {
             DB::rollback();
             Alert::error('Gagal', 'Terjadi kesalahan saat memperbarui user');

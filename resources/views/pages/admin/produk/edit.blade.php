@@ -33,7 +33,7 @@
                         <div class="row mb-3">
                             <label class="col-sm-2 col-form-label">Harga</label>
                             <div class="col-sm-10">
-                                <input type="number" class="form-control" name="harga_produk" value="{{ $produk->harga_produk }}" required>
+                                <input type="text" class="form-control" name="harga_produk" id="harga_produk" value="{{ number_format($produk->harga_produk, 0, ',', '.') }}" required autocomplete="off">
                             </div>
                         </div>
 
@@ -176,6 +176,22 @@
             const unit = selectedOption.data('unit');
             const row = $(this).closest('.recipe-item');
             row.find('.unit-input').val(unit || '');
+        });
+
+        // Format harga dengan pemisah ribuan saat input
+        $('#harga_produk').on('input', function() {
+            let value = $(this).val().replace(/\D/g, '');
+            if (value) {
+                value = parseInt(value, 10).toLocaleString('id-ID');
+            } else {
+                value = '';
+            }
+            $(this).val(value);
+        });
+        // Pastikan value harga_produk dikirim tanpa titik saat submit
+        $('form').on('submit', function() {
+            let harga = $('#harga_produk').val().replace(/\./g, '');
+            $('#harga_produk').val(harga);
         });
     });
 </script>

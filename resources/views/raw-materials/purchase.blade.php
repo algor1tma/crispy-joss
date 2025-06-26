@@ -166,39 +166,56 @@
         
         // Update jumlah
         $(document).on('input', '.item-quantity', function() {
+            // Hanya update value di cart, jangan updateCart()
             const index = $(this).data('index');
             let newQuantity = parseInt($(this).val()) || 0;
-            
             if (newQuantity < 1) {
                 newQuantity = 1;
                 $(this).val(1);
             }
-            
             cart[index].quantity = newQuantity;
             cart[index].subtotal = cart[index].price * newQuantity;
             updateSubtotalInput(index);
+            // Jangan panggil updateCart() di sini
+        });
+
+        // Update cart saat input quantity kehilangan fokus atau tekan Enter
+        $(document).on('blur', '.item-quantity', function() {
             updateCart();
         });
-        
-        function updateSubtotalInput(index) {
-            $(`.item-subtotal[data-index="${index}"]`).val(Math.round(cart[index].subtotal));
-        }
-        
+        $(document).on('keydown', '.item-quantity', function(e) {
+            if (e.key === 'Enter') {
+                $(this).blur();
+            }
+        });
+
         // Update subtotal
         $(document).on('input', '.item-subtotal', function() {
+            // Hanya update value di cart, jangan updateCart()
             const index = $(this).data('index');
             const newSubtotal = parseFloat($(this).val()) || 0;
-            
             if (newSubtotal > 0) {
                 cart[index].subtotal = newSubtotal;
                 // Update harga per satuan
                 cart[index].price = Math.round(newSubtotal / cart[index].quantity);
                 updatePricePerUnit(index);
             }
-            
+            // Jangan panggil updateCart() di sini
+        });
+        $(document).on('blur', '.item-subtotal', function() {
             updateCart();
         });
-
+        $(document).on('keydown', '.item-subtotal', function(e) {
+            if (e.key === 'Enter') {
+                $(this).blur();
+            }
+        });
+        
+        function updateSubtotalInput(index) {
+            $(`.item-subtotal[data-index="${index}"]`).val(Math.round(cart[index].subtotal));
+        }
+        
+        // Update harga per satuan
         function updatePricePerUnit(index) {
             const pricePerUnit = Math.round(cart[index].price);
             $(`.price-per-unit[data-index="${index}"]`).text(
@@ -222,7 +239,7 @@
                         </td>
                         <td>
                             <input type="number" class="form-control form-control-sm item-quantity" 
-                                data-index="${index}" value="${item.quantity}" min="1" step="1" style="width: 80px">
+                                data-index="${index}" value="${item.quantity}" min="1" style="width: 80px">
                             <small class="text-muted">${item.unit}</small>
                         </td>
                         <td>
@@ -308,4 +325,4 @@
         }
     });
 </script>
-@endpush 
+@endpush
