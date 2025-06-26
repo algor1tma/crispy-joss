@@ -89,6 +89,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [PosController::class, 'index'])->name('pos.index');
         Route::post('/', [PosController::class, 'store'])->name('pos.store');
         Route::get('/receipt/{id}', [PosController::class, 'printReceipt'])->name('pos.receipt');
+        Route::get('/thermal-receipt/{id}', [PosController::class, 'printThermalReceipt'])->name('pos.thermal-receipt');
         Route::post('/check-availability', [PosController::class, 'checkAvailability'])->name('pos.check-availability');
     });
 
